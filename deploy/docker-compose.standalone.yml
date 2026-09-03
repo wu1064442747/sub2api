@@ -38,6 +38,9 @@ services:
       - SERVER_PORT=8080
       - SERVER_MODE=${SERVER_MODE:-release}
       - RUN_MODE=${RUN_MODE:-standard}
+      - PLAUSIBLE_DOMAIN=${PLAUSIBLE_DOMAIN:-}
+      - PLAUSIBLE_SCRIPT_URL=${PLAUSIBLE_SCRIPT_URL:-https://plausible.ai-baby-dance.com/js/script.js}
+      - MICROSOFT_CLARITY_PROJECT_ID=${MICROSOFT_CLARITY_PROJECT_ID:-}
 
       # =======================================================================
       # Database Configuration (PostgreSQL) - Required

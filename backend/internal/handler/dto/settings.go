@@ -247,6 +247,9 @@ type PublicSettings struct {
 	SiteName                         string                   `json:"site_name"`
 	SiteLogo                         string                   `json:"site_logo"`
 	SiteSubtitle                     string                   `json:"site_subtitle"`
+	PlausibleDomain                  string                   `json:"plausible_domain,omitempty"`
+	PlausibleScriptURL               string                   `json:"plausible_script_url,omitempty"`
+	MicrosoftClarityProjectID        string                   `json:"microsoft_clarity_project_id,omitempty"`
 	APIBaseURL                       string                   `json:"api_base_url"`
 	ContactInfo                      string                   `json:"contact_info"`
 	DocURL                           string                   `json:"doc_url"`

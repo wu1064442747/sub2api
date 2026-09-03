@@ -30,6 +30,32 @@ func TestLoadForBootstrapAllowsMissingJWTSecret(t *testing.T) {
 	}
 }
 
+func TestLoadAnalyticsConfigFromEnv(t *testing.T) {
+	resetViperWithJWTSecret(t)
+	t.Setenv("PLAUSIBLE_DOMAIN", "sub2api.ai-baby-dance.com")
+	t.Setenv("PLAUSIBLE_SCRIPT_URL", "https://plausible.ai-baby-dance.com/js/script.js")
+	t.Setenv("MICROSOFT_CLARITY_PROJECT_ID", "clarity-test")
+
+	cfg, err := Load()
+	require.NoError(t, err)
+	require.Equal(t, "sub2api.ai-baby-dance.com", cfg.Analytics.PlausibleDomain)
+	require.Equal(t, "https://plausible.ai-baby-dance.com/js/script.js", cfg.Analytics.PlausibleScriptURL)
+	require.Equal(t, "clarity-test", cfg.Analytics.MicrosoftClarityProjectID)
+}
+
+func TestLoadAnalyticsConfigUsesDefaultPlausibleScriptURL(t *testing.T) {
+	resetViperWithJWTSecret(t)
+	t.Setenv("PLAUSIBLE_DOMAIN", "")
+	t.Setenv("PLAUSIBLE_SCRIPT_URL", "")
+	t.Setenv("MICROSOFT_CLARITY_PROJECT_ID", "")
+
+	cfg, err := Load()
+	require.NoError(t, err)
+	require.Equal(t, "https://plausible.ai-baby-dance.com/js/script.js", cfg.Analytics.PlausibleScriptURL)
+	require.Empty(t, cfg.Analytics.PlausibleDomain)
+	require.Empty(t, cfg.Analytics.MicrosoftClarityProjectID)
+}
+
 func TestNormalizeRunMode(t *testing.T) {
 	tests := []struct {
 		input    string

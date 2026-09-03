@@ -63,6 +63,22 @@ func TestSettingService_GetPublicSettings_ExposesRegistrationEmailSuffixWhitelis
 	require.Equal(t, []string{"@example.com", "@foo.bar"}, settings.RegistrationEmailSuffixWhitelist)
 }
 
+func TestSettingService_GetPublicSettings_ExposesAnalyticsConfig(t *testing.T) {
+	svc := NewSettingService(&settingPublicRepoStub{values: map[string]string{}}, &config.Config{
+		Analytics: config.AnalyticsConfig{
+			PlausibleDomain:           "sub2api.ai-baby-dance.com",
+			PlausibleScriptURL:        "https://plausible.ai-baby-dance.com/js/script.js",
+			MicrosoftClarityProjectID: "clarity-test",
+		},
+	})
+
+	settings, err := svc.GetPublicSettings(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, "sub2api.ai-baby-dance.com", settings.PlausibleDomain)
+	require.Equal(t, "https://plausible.ai-baby-dance.com/js/script.js", settings.PlausibleScriptURL)
+	require.Equal(t, "clarity-test", settings.MicrosoftClarityProjectID)
+}
+
 func TestSettingService_GetPublicSettings_ExposesTablePreferences(t *testing.T) {
 	repo := &settingPublicRepoStub{
 		values: map[string]string{

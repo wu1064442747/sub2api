@@ -129,7 +129,7 @@ security:
     # 默认 CSP 策略（如果静态资源托管在其他域名，请自行覆盖）
     # Note: __CSP_NONCE__ will be replaced with 'nonce-xxx' at request time for inline script security
     # 注意：__CSP_NONCE__ 会在请求时被替换为 'nonce-xxx'，用于内联脚本安全
-    policy: "default-src 'self'; script-src 'self' __CSP_NONCE__ https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    policy: "default-src 'self'; script-src 'self' __CSP_NONCE__ https://challenges.cloudflare.com https://static.cloudflareinsights.com https://plausible.ai-baby-dance.com https://www.clarity.ms https://scripts.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
   proxy_probe:
     # Allow skipping TLS verification for proxy probe (debug only)
     # 允许代理探测时跳过 TLS 证书验证（仅用于调试）
@@ -140,6 +140,21 @@ security:
     # 辅助服务（更新检查、定价数据拉取）代理初始化失败时是否允许回退直连。
     # 不影响 AI 账号网关连接。默认 false：fail-fast 防止 IP 泄露。
     allow_direct_on_error: false
+
+# =============================================================================
+# Analytics Configuration
+# 分析配置
+# =============================================================================
+# Analytics identifiers are deployment-owned and are exposed to the public
+# frontend only when the corresponding feature is configured.
+# 分析标识由部署配置管理，仅在配置后暴露给前端。
+analytics:
+  # Plausible site domain, for example: sub2api.ai-baby-dance.com
+  plausible_domain: ""
+  # Self-hosted Plausible script URL
+  plausible_script_url: "https://plausible.ai-baby-dance.com/js/script.js"
+  # Microsoft Clarity project ID; leave empty to disable Clarity
+  microsoft_clarity_project_id: ""
 
 # =============================================================================
 # Gateway Configuration

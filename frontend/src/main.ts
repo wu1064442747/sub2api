@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import i18n, { initI18n } from './i18n'
 import { useAppStore } from '@/stores/app'
+import { initializeAnalytics } from '@/utils/analytics'
 import './style.css'
 
 function initThemeClass() {
@@ -26,6 +27,7 @@ async function bootstrap() {
   // This must happen after pinia is installed but before router and i18n
   const appStore = useAppStore()
   appStore.initFromInjectedConfig()
+  initializeAnalytics(appStore.cachedPublicSettings)
 
   // Set document title immediately after config is loaded
   if (appStore.siteName && appStore.siteName !== 'Sub2API') {

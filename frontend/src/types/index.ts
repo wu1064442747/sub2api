@@ -203,6 +203,9 @@ export interface PublicSettings {
   site_name: string
   site_logo: string
   site_subtitle: string
+  plausible_domain?: string
+  plausible_script_url?: string
+  microsoft_clarity_project_id?: string
   api_base_url: string
   contact_info: string
   doc_url: string

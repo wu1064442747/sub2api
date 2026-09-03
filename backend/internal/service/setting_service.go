@@ -46,6 +46,31 @@ type SettingRepository interface {
 	Delete(ctx context.Context, key string) error
 }
 
+const defaultPlausibleScriptURL = "https://plausible.ai-baby-dance.com/js/script.js"
+
+func analyticsPlausibleDomain(cfg *config.Config) string {
+	if cfg == nil {
+		return ""
+	}
+	return strings.TrimSpace(cfg.Analytics.PlausibleDomain)
+}
+
+func analyticsPlausibleScriptURL(cfg *config.Config) string {
+	if cfg != nil {
+		if value := strings.TrimSpace(cfg.Analytics.PlausibleScriptURL); value != "" {
+			return value
+		}
+	}
+	return defaultPlausibleScriptURL
+}
+
+func analyticsClarityProjectID(cfg *config.Config) string {
+	if cfg == nil {
+		return ""
+	}
+	return strings.TrimSpace(cfg.Analytics.MicrosoftClarityProjectID)
+}
+
 // cachedVersionBounds 缓存 Claude Code 版本号上下限（进程内缓存，60s TTL）
 type cachedVersionBounds struct {
 	min       string // 空字符串 = 不检查
@@ -697,6 +722,9 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		SiteName:                         s.getStringOrDefault(settings, SettingKeySiteName, "Sub2API"),
 		SiteLogo:                         settings[SettingKeySiteLogo],
 		SiteSubtitle:                     s.getStringOrDefault(settings, SettingKeySiteSubtitle, "Subscription to API Conversion Platform"),
+		PlausibleDomain:                  analyticsPlausibleDomain(s.cfg),
+		PlausibleScriptURL:               analyticsPlausibleScriptURL(s.cfg),
+		MicrosoftClarityProjectID:        analyticsClarityProjectID(s.cfg),
 		APIBaseURL:                       settings[SettingKeyAPIBaseURL],
 		ContactInfo:                      settings[SettingKeyContactInfo],
 		DocURL:                           settings[SettingKeyDocURL],
@@ -851,6 +879,9 @@ type PublicSettingsInjectionPayload struct {
 	SiteName                         string                   `json:"site_name"`
 	SiteLogo                         string                   `json:"site_logo"`
 	SiteSubtitle                     string                   `json:"site_subtitle"`
+	PlausibleDomain                  string                   `json:"plausible_domain,omitempty"`
+	PlausibleScriptURL               string                   `json:"plausible_script_url,omitempty"`
+	MicrosoftClarityProjectID        string                   `json:"microsoft_clarity_project_id,omitempty"`
 	APIBaseURL                       string                   `json:"api_base_url"`
 	ContactInfo                      string                   `json:"contact_info"`
 	DocURL                           string                   `json:"doc_url"`
@@ -915,6 +946,9 @@ func (s *SettingService) GetPublicSettingsForInjection(ctx context.Context) (any
 		SiteName:                         settings.SiteName,
 		SiteLogo:                         settings.SiteLogo,
 		SiteSubtitle:                     settings.SiteSubtitle,
+		PlausibleDomain:                  settings.PlausibleDomain,
+		PlausibleScriptURL:               settings.PlausibleScriptURL,
+		MicrosoftClarityProjectID:        settings.MicrosoftClarityProjectID,
 		APIBaseURL:                       settings.APIBaseURL,
 		ContactInfo:                      settings.ContactInfo,
 		DocURL:                           settings.DocURL,
