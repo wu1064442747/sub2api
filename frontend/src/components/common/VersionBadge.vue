@@ -231,7 +231,48 @@
                 </button>
               </div>
 
-              <!-- Priority 3: Update available for source build - show git pull hint -->
+              <!-- Priority 3: Image-managed container deployments update outside the app. -->
+              <div v-else-if="hasUpdate && isContainerBuild" class="space-y-2">
+                <div
+                  class="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800/50 dark:bg-blue-900/20"
+                >
+                  <div
+                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50"
+                  >
+                    <Icon
+                      name="download"
+                      size="sm"
+                      :stroke-width="2"
+                      class="text-blue-600 dark:text-blue-400"
+                    />
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-medium text-blue-700 dark:text-blue-300">
+                      {{ t('version.updateAvailable') }}
+                    </p>
+                    <p class="text-xs text-blue-600/70 dark:text-blue-400/70">
+                      v{{ latestVersion }}
+                    </p>
+                  </div>
+                </div>
+                <p
+                  class="rounded-lg border border-blue-200 bg-blue-50 p-2 text-xs leading-4 text-blue-600 dark:border-blue-800/50 dark:bg-blue-900/20 dark:text-blue-400"
+                >
+                  {{ t('version.containerModeHint') }}
+                </p>
+                <a
+                  v-if="releaseInfo?.html_url && releaseInfo.html_url !== '#'"
+                  :href="releaseInfo.html_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center justify-center gap-2 py-1 text-xs text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  {{ t('version.viewChangelog') }}
+                  <Icon name="externalLink" size="xs" :stroke-width="2" />
+                </a>
+              </div>
+
+              <!-- Priority 4: Update available for source build - show git pull hint -->
               <div v-else-if="hasUpdate && !isReleaseBuild" class="space-y-2">
                 <a
                   v-if="releaseInfo?.html_url && releaseInfo.html_url !== '#'"
@@ -291,7 +332,7 @@
                 </div>
               </div>
 
-              <!-- Priority 4: Update available for release build - show update button -->
+              <!-- Priority 5: Update available for release build - show update button -->
               <div v-else-if="hasUpdate && isReleaseBuild" class="space-y-2">
                 <!-- Update info card -->
                 <div
@@ -375,7 +416,10 @@
                 </a>
 
                 <!-- Version rollback entry -->
-                <div class="border-t border-gray-100 pt-2 dark:border-dark-700">
+                <div
+                  v-if="!isContainerBuild"
+                  class="border-t border-gray-100 pt-2 dark:border-dark-700"
+                >
                   <button
                     @click="toggleRollbackPanel"
                     class="group flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600 dark:text-dark-500 dark:hover:bg-dark-700/50 dark:hover:text-dark-300"
@@ -728,8 +772,9 @@ const activeManualCommand = computed(() =>
   manualTab.value === 'docker' ? dockerRollbackCommand.value : scriptRollbackCommand.value
 )
 
-// Only show update check for release builds (binary/docker deployment)
+// Release builds use in-place updates; containers are replaced by the deployment platform.
 const isReleaseBuild = computed(() => buildType.value === 'release')
+const isContainerBuild = computed(() => buildType.value === 'container')
 
 function toggleDropdown() {
   dropdownOpen.value = !dropdownOpen.value

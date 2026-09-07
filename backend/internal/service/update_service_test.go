@@ -69,6 +69,19 @@ func TestUpdateServicePerformUpdateNoUpdateReturnsSentinel(t *testing.T) {
 	require.ErrorIs(t, err, ErrNoUpdateAvailable)
 }
 
+func TestUpdateServiceContainerBuildRejectsInPlaceMutations(t *testing.T) {
+	svc := NewUpdateService(
+		&updateServiceCacheStub{},
+		&updateServiceGitHubClientStub{},
+		"0.2.2",
+		"container",
+	)
+
+	require.ErrorIs(t, svc.PerformUpdate(context.Background()), ErrContainerManagedUpdate)
+	require.ErrorIs(t, svc.Rollback(), ErrContainerManagedUpdate)
+	require.ErrorIs(t, svc.RollbackToVersion(context.Background(), "0.2.1"), ErrContainerManagedUpdate)
+}
+
 func newRollbackTestService(current string, releases []*GitHubRelease) *UpdateService {
 	return NewUpdateService(
 		&updateServiceCacheStub{},

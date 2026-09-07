@@ -343,6 +343,9 @@ type PublicSettings struct {
 	SiteName                            string
 	SiteLogo                            string
 	SiteSubtitle                        string
+	PlausibleDomain                     string
+	PlausibleScriptURL                  string
+	MicrosoftClarityProjectID           string
 	APIBaseURL                          string
 	ContactInfo                         string
 	DocURL                              string

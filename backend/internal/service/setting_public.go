@@ -14,6 +14,31 @@ import (
 	"github.com/Wei-Shaw/sub2api/internal/pkg/timezone"
 )
 
+const defaultPlausibleScriptURL = "https://plausible.ai-baby-dance.com/js/script.js"
+
+func (s *SettingService) analyticsPlausibleDomain() string {
+	if s.cfg == nil {
+		return ""
+	}
+	return strings.TrimSpace(s.cfg.Analytics.PlausibleDomain)
+}
+
+func (s *SettingService) analyticsPlausibleScriptURL() string {
+	if s.cfg != nil {
+		if value := strings.TrimSpace(s.cfg.Analytics.PlausibleScriptURL); value != "" {
+			return value
+		}
+	}
+	return defaultPlausibleScriptURL
+}
+
+func (s *SettingService) analyticsClarityProjectID() string {
+	if s.cfg == nil {
+		return ""
+	}
+	return strings.TrimSpace(s.cfg.Analytics.MicrosoftClarityProjectID)
+}
+
 func normalizeLoginAgreementMode(raw string) string {
 	switch strings.ToLower(strings.TrimSpace(raw)) {
 	case "checkbox":
@@ -324,6 +349,9 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		SiteName:                            s.getStringOrDefault(settings, SettingKeySiteName, "Sub2API"),
 		SiteLogo:                            settings[SettingKeySiteLogo],
 		SiteSubtitle:                        s.getStringOrDefault(settings, SettingKeySiteSubtitle, "Subscription to API Conversion Platform"),
+		PlausibleDomain:                     s.analyticsPlausibleDomain(),
+		PlausibleScriptURL:                  s.analyticsPlausibleScriptURL(),
+		MicrosoftClarityProjectID:           s.analyticsClarityProjectID(),
 		APIBaseURL:                          settings[SettingKeyAPIBaseURL],
 		ContactInfo:                         settings[SettingKeyContactInfo],
 		DocURL:                              settings[SettingKeyDocURL],
@@ -574,6 +602,9 @@ type PublicSettingsInjectionPayload struct {
 	SiteName                            string                   `json:"site_name"`
 	SiteLogo                            string                   `json:"site_logo"`
 	SiteSubtitle                        string                   `json:"site_subtitle"`
+	PlausibleDomain                     string                   `json:"plausible_domain,omitempty"`
+	PlausibleScriptURL                  string                   `json:"plausible_script_url,omitempty"`
+	MicrosoftClarityProjectID           string                   `json:"microsoft_clarity_project_id,omitempty"`
 	APIBaseURL                          string                   `json:"api_base_url"`
 	ContactInfo                         string                   `json:"contact_info"`
 	DocURL                              string                   `json:"doc_url"`
@@ -663,6 +694,9 @@ func (s *SettingService) GetPublicSettingsForInjection(ctx context.Context) (any
 		SiteName:                            settings.SiteName,
 		SiteLogo:                            settings.SiteLogo,
 		SiteSubtitle:                        settings.SiteSubtitle,
+		PlausibleDomain:                     settings.PlausibleDomain,
+		PlausibleScriptURL:                  settings.PlausibleScriptURL,
+		MicrosoftClarityProjectID:           settings.MicrosoftClarityProjectID,
 		APIBaseURL:                          settings.APIBaseURL,
 		ContactInfo:                         settings.ContactInfo,
 		DocURL:                              settings.DocURL,
