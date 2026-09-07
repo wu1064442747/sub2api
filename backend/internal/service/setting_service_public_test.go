@@ -152,6 +152,30 @@ func TestSettingService_GetPublicSettings_ExposesForceEmailOnThirdPartySignup(t 
 	require.True(t, settings.ForceEmailOnThirdPartySignup)
 }
 
+func TestSettingService_GetPublicSettings_ExposesAnalyticsConfiguration(t *testing.T) {
+	svc := NewSettingService(&settingPublicRepoStub{values: map[string]string{}}, &config.Config{
+		Analytics: config.AnalyticsConfig{
+			PlausibleDomain:           " sub2api.ai-baby-dance.com ",
+			PlausibleScriptURL:        " https://plausible.ai-baby-dance.com/js/script.js ",
+			MicrosoftClarityProjectID: " clarity-project ",
+		},
+	})
+
+	settings, err := svc.GetPublicSettings(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, "sub2api.ai-baby-dance.com", settings.PlausibleDomain)
+	require.Equal(t, "https://plausible.ai-baby-dance.com/js/script.js", settings.PlausibleScriptURL)
+	require.Equal(t, "clarity-project", settings.MicrosoftClarityProjectID)
+
+	injected, err := svc.GetPublicSettingsForInjection(context.Background())
+	require.NoError(t, err)
+	payload, ok := injected.(*PublicSettingsInjectionPayload)
+	require.True(t, ok)
+	require.Equal(t, settings.PlausibleDomain, payload.PlausibleDomain)
+	require.Equal(t, settings.PlausibleScriptURL, payload.PlausibleScriptURL)
+	require.Equal(t, settings.MicrosoftClarityProjectID, payload.MicrosoftClarityProjectID)
+}
+
 func TestSettingService_GetPublicSettings_ExposesAllowUserViewErrorRequests(t *testing.T) {
 	repo := &settingPublicRepoStub{
 		values: map[string]string{

@@ -9,6 +9,7 @@ import AnnouncementPopup from '@/components/common/AnnouncementPopup.vue'
 import { useAppStore, useAuthStore, useSubscriptionStore, useAnnouncementStore, useAdminComplianceStore, useAdminSettingsStore } from '@/stores'
 import { getSetupStatus } from '@/api/setup'
 import { updateFavicon } from '@/utils/branding'
+import { initializeAnalytics } from '@/utils/analytics'
 
 const router = useRouter()
 const route = useRoute()
@@ -130,6 +131,7 @@ onMounted(async () => {
 
   // Load public settings into appStore (will be cached for other components)
   await appStore.fetchPublicSettings()
+  initializeAnalytics(appStore.cachedPublicSettings)
 
   // Re-resolve document title now that site settings are available
   updateDocumentTitle()

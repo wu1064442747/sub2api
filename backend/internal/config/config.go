@@ -32,7 +32,7 @@ const (
 
 // DefaultCSPPolicy is the default Content-Security-Policy with nonce support
 // __CSP_NONCE__ will be replaced with actual nonce at request time by the SecurityHeaders middleware
-const DefaultCSPPolicy = "default-src 'self'; worker-src 'self' blob:; script-src 'self' __CSP_NONCE__ https://challenges.cloudflare.com https://*.alicdn.com https://static.cloudflareinsights.com https://turing.captcha.qcloud.com https://turing.captcha.gtimg.com https://ca.turing.captcha.qcloud.com https://global.turing.captcha.gtimg.com https://www.tycaptcha.com https://cloudcache.tencentcs.com https://*.stripe.com https://static.airwallex.com https://checkout.airwallex.com https://static-demo.airwallex.com https://checkout-demo.airwallex.com; style-src 'self' 'unsafe-inline' https://*.captcha.gtimg.com https://fonts.googleapis.com https://*.alicdn.com https://static.airwallex.com https://checkout.airwallex.com https://static-demo.airwallex.com https://checkout-demo.airwallex.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://turing.captcha.qcloud.com https://www.tycaptcha.com https://rce.tencentrio.com https:; frame-src 'self' https://challenges.cloudflare.com https://turing.captcha.qcloud.com https://ca.turing.captcha.qcloud.com https://www.tycaptcha.com https://*.stripe.com https://checkout.airwallex.com https://checkout-demo.airwallex.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+const DefaultCSPPolicy = "default-src 'self'; worker-src 'self' blob:; script-src 'self' __CSP_NONCE__ https://challenges.cloudflare.com https://*.alicdn.com https://static.cloudflareinsights.com https://turing.captcha.qcloud.com https://turing.captcha.gtimg.com https://ca.turing.captcha.qcloud.com https://global.turing.captcha.gtimg.com https://www.tycaptcha.com https://cloudcache.tencentcs.com https://*.stripe.com https://static.airwallex.com https://checkout.airwallex.com https://static-demo.airwallex.com https://checkout-demo.airwallex.com https://plausible.ai-baby-dance.com https://www.clarity.ms https://scripts.clarity.ms; style-src 'self' 'unsafe-inline' https://*.captcha.gtimg.com https://fonts.googleapis.com https://*.alicdn.com https://static.airwallex.com https://checkout.airwallex.com https://static-demo.airwallex.com https://checkout-demo.airwallex.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://turing.captcha.qcloud.com https://www.tycaptcha.com https://rce.tencentrio.com https:; frame-src 'self' https://challenges.cloudflare.com https://turing.captcha.qcloud.com https://ca.turing.captcha.qcloud.com https://www.tycaptcha.com https://*.stripe.com https://checkout.airwallex.com https://checkout-demo.airwallex.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 
 // UMQ（用户消息队列）模式常量
 const (
@@ -70,6 +70,7 @@ type Config struct {
 	Log                     LogConfig                     `mapstructure:"log"`
 	CORS                    CORSConfig                    `mapstructure:"cors"`
 	Security                SecurityConfig                `mapstructure:"security"`
+	Analytics               AnalyticsConfig               `mapstructure:"analytics"`
 	Billing                 BillingConfig                 `mapstructure:"billing"`
 	Turnstile               TurnstileConfig               `mapstructure:"turnstile"`
 	Database                DatabaseConfig                `mapstructure:"database"`
@@ -833,6 +834,12 @@ type ResponseHeaderConfig struct {
 type CSPConfig struct {
 	Enabled bool   `mapstructure:"enabled"`
 	Policy  string `mapstructure:"policy"`
+}
+
+type AnalyticsConfig struct {
+	PlausibleDomain           string `mapstructure:"plausible_domain"`
+	PlausibleScriptURL        string `mapstructure:"plausible_script_url"`
+	MicrosoftClarityProjectID string `mapstructure:"microsoft_clarity_project_id"`
 }
 
 type ProxyFallbackConfig struct {
@@ -1841,6 +1848,9 @@ func load(allowMissingJWTSecret bool) (*Config, error) {
 		cfg.Server.Mode = "debug"
 	}
 	cfg.Server.FrontendURL = strings.TrimSpace(cfg.Server.FrontendURL)
+	cfg.Analytics.PlausibleDomain = strings.TrimSpace(cfg.Analytics.PlausibleDomain)
+	cfg.Analytics.PlausibleScriptURL = strings.TrimSpace(cfg.Analytics.PlausibleScriptURL)
+	cfg.Analytics.MicrosoftClarityProjectID = strings.TrimSpace(cfg.Analytics.MicrosoftClarityProjectID)
 	cfg.JWT.Secret = strings.TrimSpace(cfg.JWT.Secret)
 	cfg.LinuxDo.ClientID = strings.TrimSpace(cfg.LinuxDo.ClientID)
 	cfg.LinuxDo.ClientSecret = strings.TrimSpace(cfg.LinuxDo.ClientSecret)
@@ -2067,6 +2077,12 @@ func setDefaults() {
 
 	// Security - disable direct fallback on proxy error
 	viper.SetDefault("security.proxy_fallback.allow_direct_on_error", false)
+	viper.SetDefault("analytics.plausible_domain", "")
+	viper.SetDefault("analytics.plausible_script_url", "https://plausible.ai-baby-dance.com/js/script.js")
+	viper.SetDefault("analytics.microsoft_clarity_project_id", "")
+	_ = viper.BindEnv("analytics.plausible_domain", "PLAUSIBLE_DOMAIN", "ANALYTICS_PLAUSIBLE_DOMAIN")
+	_ = viper.BindEnv("analytics.plausible_script_url", "PLAUSIBLE_SCRIPT_URL", "ANALYTICS_PLAUSIBLE_SCRIPT_URL")
+	_ = viper.BindEnv("analytics.microsoft_clarity_project_id", "MICROSOFT_CLARITY_PROJECT_ID", "CLARITY_PROJECT_ID", "ANALYTICS_MICROSOFT_CLARITY_PROJECT_ID")
 
 	// Billing
 	viper.SetDefault("billing.circuit_breaker.enabled", true)

@@ -30,6 +30,25 @@ func TestLoadDefaultModelsListReadMaxBytes(t *testing.T) {
 	require.Equal(t, DefaultModelsListReadMaxBytes, cfg.Gateway.ModelsListReadMaxBytes)
 }
 
+func TestLoadAnalyticsConfigurationFromEnvironment(t *testing.T) {
+	resetViperWithJWTSecret(t)
+	t.Setenv("PLAUSIBLE_DOMAIN", "sub2api.ai-baby-dance.com")
+	t.Setenv("PLAUSIBLE_SCRIPT_URL", "https://plausible.ai-baby-dance.com/js/script.js")
+	t.Setenv("MICROSOFT_CLARITY_PROJECT_ID", "clarity-project")
+
+	cfg, err := Load()
+	require.NoError(t, err)
+	require.Equal(t, "sub2api.ai-baby-dance.com", cfg.Analytics.PlausibleDomain)
+	require.Equal(t, "https://plausible.ai-baby-dance.com/js/script.js", cfg.Analytics.PlausibleScriptURL)
+	require.Equal(t, "clarity-project", cfg.Analytics.MicrosoftClarityProjectID)
+}
+
+func TestDefaultCSPPolicyAllowsAnalyticsScripts(t *testing.T) {
+	require.Contains(t, DefaultCSPPolicy, "https://plausible.ai-baby-dance.com")
+	require.Contains(t, DefaultCSPPolicy, "https://www.clarity.ms")
+	require.Contains(t, DefaultCSPPolicy, "https://scripts.clarity.ms")
+}
+
 func TestLoadTimezonePrecedence(t *testing.T) {
 	tests := []struct {
 		name         string
