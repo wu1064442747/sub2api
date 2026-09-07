@@ -18,7 +18,8 @@ ARG GOSUMDB=sum.golang.google.cn
 FROM ${NODE_IMAGE} AS frontend-builder
 
 WORKDIR /app/frontend
-ENV NODE_OPTIONS=--max-old-space-size=1536
+# vue-tsc for the v0.2.1 frontend can exceed 1.5 GB during a clean container build.
+ENV NODE_OPTIONS=--max-old-space-size=2048
 
 # Install pnpm. Keep this pinned to the lockfile-compatible major version so
 # Docker builds remain reproducible when pnpm changes config validation rules.
