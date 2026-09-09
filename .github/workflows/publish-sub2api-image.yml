@@ -12,7 +12,7 @@ permissions:
 
 env:
   IMAGE_NAME: ghcr.io/wu1064442747/sub2api
-  IMAGE_VERSION: v0.2.3-analytics.1
+  IMAGE_VERSION: v0.2.4-analytics.1
 
 jobs:
   publish:
@@ -39,7 +39,7 @@ jobs:
           platforms: linux/amd64
           push: true
           build-args: |
-            VERSION=0.2.3
+            VERSION=0.2.4
             COMMIT=${{ github.sha }}
             BUILD_TYPE=container
           tags: |
