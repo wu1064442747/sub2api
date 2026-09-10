@@ -341,6 +341,7 @@ export default {
 
   // Navigation
   nav: {
+    images: 'Image Studio',
     dashboard: 'Dashboard',
     announcements: 'Announcements',
     apiKeys: 'API Keys',
