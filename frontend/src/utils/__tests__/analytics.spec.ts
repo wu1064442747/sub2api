@@ -19,9 +19,7 @@ describe('analytics', () => {
     initializeAnalytics({ plausible_domain: 'sub2api.ai-baby-dance.com' })
     initializeAnalytics({ plausible_domain: 'sub2api.ai-baby-dance.com' })
 
-    const script = document.head.querySelector<HTMLScriptElement>(
-      'script[data-sub2api-analytics="plausible"]'
-    )
+    const script = document.head.querySelector<HTMLScriptElement>('script[data-sub2api-analytics="plausible"]')
     expect(script).not.toBeNull()
     expect(script?.src).toBe('https://plausible.ai-baby-dance.com/js/script.js')
     expect(script?.dataset.domain).toBe('sub2api.ai-baby-dance.com')
@@ -34,9 +32,7 @@ describe('analytics', () => {
     window.clarity?.('consent')
     initializeAnalytics({ microsoft_clarity_project_id: 'clarity-test' })
 
-    const script = document.head.querySelector<HTMLScriptElement>(
-      'script[data-sub2api-analytics="clarity"]'
-    )
+    const script = document.head.querySelector<HTMLScriptElement>('script[data-sub2api-analytics="clarity"]')
     expect(script?.src).toBe('https://www.clarity.ms/tag/clarity-test')
     expect(window.clarity?.q).toEqual([['consent']])
     expect(document.head.querySelectorAll('script[data-sub2api-analytics="clarity"]')).toHaveLength(1)
