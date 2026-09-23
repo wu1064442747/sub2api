@@ -23,9 +23,7 @@ function hasAnalyticsScript(kind: string): boolean {
 function initializePlausible(settings: AnalyticsSettings): void {
   const domain = settings.plausible_domain?.trim()
   const scriptURL = settings.plausible_script_url?.trim() || DEFAULT_PLAUSIBLE_SCRIPT_URL
-  if (!domain || !isHTTPSURL(scriptURL) || hasAnalyticsScript('plausible')) {
-    return
-  }
+  if (!domain || !isHTTPSURL(scriptURL) || hasAnalyticsScript('plausible')) return
 
   window.plausible = window.plausible || ((...args: unknown[]) => {
     window.plausible!.q = window.plausible!.q || []
@@ -43,9 +41,7 @@ function initializePlausible(settings: AnalyticsSettings): void {
 
 function initializeClarity(settings: AnalyticsSettings): void {
   const projectID = settings.microsoft_clarity_project_id?.trim()
-  if (!projectID || !CLARITY_PROJECT_ID_PATTERN.test(projectID) || hasAnalyticsScript('clarity')) {
-    return
-  }
+  if (!projectID || !CLARITY_PROJECT_ID_PATTERN.test(projectID) || hasAnalyticsScript('clarity')) return
 
   window.clarity = window.clarity || ((...args: unknown[]) => {
     window.clarity!.q = window.clarity!.q || []
@@ -60,10 +56,7 @@ function initializeClarity(settings: AnalyticsSettings): void {
 }
 
 export function initializeAnalytics(settings: AnalyticsSettings | null | undefined): void {
-  if (typeof window === 'undefined' || typeof document === 'undefined' || !settings) {
-    return
-  }
-
+  if (typeof window === 'undefined' || typeof document === 'undefined' || !settings) return
   initializePlausible(settings)
   initializeClarity(settings)
 }

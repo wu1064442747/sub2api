@@ -1,4 +1,4 @@
-/** Gateway requests use the user's API key, never the console JWT/interceptors. */
+/** Gateway image requests use the user's API key, never the console JWT. */
 export interface ImageRequest {
   model: string
   prompt: string
@@ -7,6 +7,7 @@ export interface ImageRequest {
   image?: File
   mask?: File
 }
+
 export interface GeneratedImage { url: string; revisedPrompt?: string }
 
 async function gatewayRequest(path: string, key: string, init: RequestInit = {}) {
@@ -14,10 +15,10 @@ async function gatewayRequest(path: string, key: string, init: RequestInit = {})
     ...init,
     credentials: 'omit',
     redirect: 'error',
-    headers: { ...init.headers, Authorization: `Bearer ${key}` }
+    headers: { ...init.headers, Authorization: `Bearer ${key}` },
   })
   const text = await response.text()
-  let payload
+  let payload: any
   try { payload = JSON.parse(text) } catch { throw new Error(`图片服务返回了非 JSON 响应（HTTP ${response.status}），请检查网关或代理超时。`) }
   if (!response.ok) throw new Error(payload?.error?.message || `图片请求失败（HTTP ${response.status}）`)
   return payload
@@ -52,7 +53,7 @@ export async function generateImages(key: string, request: ImageRequest, signal?
   let headers: Record<string, string> = {}
   if (request.image) {
     const form = new FormData()
-    Object.entries(fields).forEach(([key, value]) => form.append(key, value))
+    Object.entries(fields).forEach(([field, value]) => form.append(field, value))
     form.append('image', request.image)
     if (request.mask) form.append('mask', request.mask)
     body = form

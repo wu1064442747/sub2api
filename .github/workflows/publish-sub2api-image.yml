@@ -1,9 +1,6 @@
 name: Publish Sub2API Container Image
 
 on:
-  push:
-    branches:
-      - codex/image-studio-v024
   workflow_dispatch:
 
 permissions:
@@ -12,7 +9,7 @@ permissions:
 
 env:
   IMAGE_NAME: ghcr.io/wu1064442747/sub2api
-  IMAGE_VERSION: v0.2.7-analytics.1
+  IMAGE_VERSION: v0.2.8-analytics.1
 
 jobs:
   publish:
@@ -20,17 +17,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push immutable container image
         uses: docker/build-push-action@v6
         with:
@@ -39,7 +33,7 @@ jobs:
           platforms: linux/amd64
           push: true
           build-args: |
-            VERSION=0.2.7
+            VERSION=0.2.8
             COMMIT=${{ github.sha }}
             BUILD_TYPE=container
           tags: |
