@@ -59,6 +59,13 @@ func main() {
 	// Parse command line flags
 	setupMode := flag.Bool("setup", false, "Run setup wizard in CLI mode")
 	showVersion := flag.Bool("version", false, "Show version information")
+	sendNewUserWelcome := flag.Bool("send-new-user-welcome", false, "Send welcome email to new users and exit")
+	newUserWelcomeDryRun := flag.Bool("new-user-welcome-dry-run", false, "List new-user welcome email candidates without sending")
+	newUserWelcomeSince := flag.String("new-user-welcome-since", "", "RFC3339 lower bound for new-user welcome candidates")
+	newUserWelcomeUntil := flag.String("new-user-welcome-until", "", "RFC3339 upper bound for new-user welcome candidates")
+	newUserWelcomeLimit := flag.Int("new-user-welcome-limit", 0, "Maximum new-user welcome emails to send; defaults to 500")
+	newUserWelcomeSubject := flag.String("new-user-welcome-subject", "", "Override new-user welcome email subject")
+	newUserWelcomeBody := flag.String("new-user-welcome-body", "", "Override new-user welcome email HTML body")
 	flag.Parse()
 
 	if *showVersion {
@@ -70,6 +77,21 @@ func main() {
 	if *setupMode {
 		if err := setup.RunCLI(); err != nil {
 			log.Fatalf("Setup failed: %v", err)
+		}
+		return
+	}
+
+	if *sendNewUserWelcome {
+		input := welcomeEmailCommandInput{
+			DryRun:  *newUserWelcomeDryRun,
+			Since:   *newUserWelcomeSince,
+			Until:   *newUserWelcomeUntil,
+			Limit:   *newUserWelcomeLimit,
+			Subject: *newUserWelcomeSubject,
+			Body:    *newUserWelcomeBody,
+		}
+		if err := runNewUserWelcomeEmailCommand(context.Background(), input); err != nil {
+			log.Fatalf("New-user welcome email failed: %v", err)
 		}
 		return
 	}
