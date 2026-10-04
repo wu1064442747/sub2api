@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -91,7 +90,7 @@ func runNewUserWelcomeEmailCommand(ctx context.Context, input welcomeEmailComman
 	runner := welcomeemail.NewRunner(welcomeemail.NewSQLStore(sqlDB), emailService)
 
 	result, runErr := runner.Run(ctx, opts)
-	log.Printf(
+	fmt.Printf(
 		"new user welcome email run: window=%s..%s candidates=%d sent=%d failed=%d dry_run=%t already_running=%t",
 		result.WindowStart.Format(time.RFC3339),
 		result.WindowEnd.Format(time.RFC3339),
@@ -101,5 +100,6 @@ func runNewUserWelcomeEmailCommand(ctx context.Context, input welcomeEmailComman
 		result.DryRun,
 		result.AlreadyRunning,
 	)
+	fmt.Println()
 	return runErr
 }
