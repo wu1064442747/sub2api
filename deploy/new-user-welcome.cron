@@ -1,0 +1,4 @@
+# Host cron daemon must use Asia/Shanghai (UTC+08:00).
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+0 22 * * * root /usr/local/bin/sub2api-new-user-welcome >> /var/log/sub2api-new-user-welcome.log 2>&1

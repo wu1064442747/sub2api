@@ -10,7 +10,7 @@ import (
 const (
 	EventName      = "new_user_welcome"
 	DefaultSubject = "欢迎体验 Sub2API 中转站"
-	DefaultBody    = "感谢访问sub2api中转站，余额已经赠送，欢迎体验！"
+	DefaultBody    = "感谢访问sub2api中转站，余额已经赠送，欢迎体验！\n\n访问网址：https://sub2api.ai-baby-dance.com/\n微信联系方式：wxl13231529281"
 	DefaultLimit   = 500
 )
 
