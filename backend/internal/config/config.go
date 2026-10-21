@@ -980,6 +980,9 @@ const (
 
 // GatewayConfig API网关相关配置
 type GatewayConfig struct {
+	// MinOutputTokens is the minimum max_output_tokens used when
+	// converting Chat Completions or Anthropic requests to Responses.
+	MinOutputTokens int `mapstructure:"min_output_tokens"`
 	// 等待上游响应头的超时时间（秒），0表示无超时
 	// 注意：这不影响流式数据传输，只控制等待响应头的时间
 	ResponseHeaderTimeout int `mapstructure:"response_header_timeout"`
@@ -2061,6 +2064,7 @@ func setDefaults() {
 	_ = viper.BindEnv("analytics.microsoft_clarity_project_id", "MICROSOFT_CLARITY_PROJECT_ID", "CLARITY_PROJECT_ID", "ANALYTICS_MICROSOFT_CLARITY_PROJECT_ID")
 
 	viper.SetDefault("run_mode", RunModeStandard)
+	viper.SetDefault("gateway.min_output_tokens", 128)
 	viper.SetDefault("simple_mode.auto_create_default_groups", true)
 	viper.SetDefault("simple_mode_key_rate_limit_enabled", false)
 
@@ -2742,6 +2746,9 @@ func setEnvReachableDefaults() {
 }
 
 func (c *Config) Validate() error {
+	if c.Gateway.MinOutputTokens < 16 {
+		return fmt.Errorf("gateway.min_output_tokens must be at least 16")
+	}
 	forwardedClientIPHeaders, err := NormalizeForwardedClientIPHeaders(c.Security.ForwardedClientIPHeaders)
 	if err != nil {
 		return fmt.Errorf("security.forwarded_client_ip_headers: %w", err)
