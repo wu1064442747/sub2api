@@ -487,6 +487,10 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 			zap.String("normalization", "call_output_to_user_message"),
 		)
 	}
+	if normalizedBody, changed := normalizeCodexPageContextBootstrap(body); changed {
+		body = normalizedBody
+		reqLog.Info("openai.codex_page_context_normalized", zap.String("normalization", "call_output_to_user_message"))
+	}
 	if normalizedBody, changed := normalizeCodexDelegationBootstrap(body); changed {
 		body = normalizedBody
 		reqLog.Info("openai.codex_delegation_bootstrap_normalized",
@@ -649,6 +653,7 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 	var lastFailoverErr *service.UpstreamFailoverError
 	var oauth429FailoverState service.OpenAIOAuth429FailoverState
 	var passthroughFailoverState openAIPassthroughFailoverState
+	nativeToolAccountSkipped := false
 
 	// 生图意图的 /v1/responses 请求必须调度到确实支持 Responses API 的账号，否则
 	// 会在 forward 阶段被静默降级为无法生图的 Chat Completions 直转（#4417）。
@@ -724,6 +729,10 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 				h.handleStreamingAwareError(c, cls.Status, cls.ErrType, cls.Message, streamStarted)
 				return
 			}
+			if nativeToolAccountSkipped && lastFailoverErr == nil {
+				h.handleStreamingAwareError(c, http.StatusServiceUnavailable, "responses_account_unavailable", "No available Responses-capable account supports this model's tool calls", streamStarted)
+				return
+			}
 			if lastFailoverErr != nil {
 				h.handleFailoverExhausted(c, lastFailoverErr, streamStarted)
 			} else {
@@ -752,6 +761,16 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 			zap.Float64("load_skew", scheduleDecision.LoadSkew),
 		)
 		account := selection.Account
+		if !service.OpenAIResponsesToolAccountCompatible(account, forwardModel, forwardBody) {
+			failedAccountIDs[account.ID] = struct{}{}
+			nativeToolAccountSkipped = true
+			if selection.ReleaseFunc != nil {
+				selection.ReleaseFunc()
+				selection.ReleaseFunc = nil
+			}
+			reqLog.Info("openai.account_skipped_tool_protocol_unsupported", zap.Int64("account_id", account.ID))
+			continue
+		}
 		if previousResponseID != "" && requestPlatform == service.PlatformOpenAI && !account.IsOpenAIApiKey() {
 			// The public Responses HTTP API supports previous_response_id on API-key
 			// accounts. OAuth/SetupToken upstreams do not, so keep searching instead
