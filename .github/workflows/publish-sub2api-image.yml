@@ -12,7 +12,7 @@ permissions:
 
 env:
   IMAGE_NAME: ghcr.io/wu1064442747/sub2api
-  IMAGE_VERSION: v0.2.23-analytics.1
+  IMAGE_VERSION: v0.2.23-analytics.2
 
 jobs:
   publish:
