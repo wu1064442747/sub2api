@@ -38,6 +38,19 @@
           <span class="hidden sm:inline">{{ t('nav.docs') }}</span>
         </a>
 
+        <a
+          v-if="user && modelPlazaEnabled"
+          href="https://www.16688.com.cn/shop/S447242"
+          target="_blank"
+          rel="noopener noreferrer"
+          :title="t('nav.chatgptClaudePurchase')"
+          :aria-label="t('nav.chatgptClaudePurchase')"
+          class="flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-dark-400 dark:hover:bg-dark-800 dark:hover:text-white"
+        >
+          <Icon name="externalLink" size="sm" aria-hidden="true" />
+          <span class="hidden whitespace-nowrap md:inline">{{ t('nav.chatgptClaudePurchase') }}</span>
+        </a>
+
         <!-- Model Plaza Entry (icon only below sm) -->
         <router-link
           v-if="user && modelPlazaEnabled"
